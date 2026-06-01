@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install dependencies",
+      "type": "shell",
+      "command": "npm ci",
+      "problemMatcher": []
+    },
+    {
+      "label": "Lint & typecheck",
+      "type": "shell",
+      "command": "npm run lint && npm run typecheck",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "Build image",
+      "type": "shell",
+      "command": "scripts/build_image.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Smoke test",
+      "type": "shell",
+      "command": "scripts/smoke_test.sh",
+      "dependsOn": "Build image",
+      "problemMatcher": []
+    }
+  ]
+}

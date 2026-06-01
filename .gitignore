@@ -1,3 +1,7 @@
+# Local smoke-test data (real iPhone exports) and scratch working copy
+sample/
+.scratch/
+
 # Logs
 logs
 *.log

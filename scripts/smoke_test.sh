@@ -3,7 +3,6 @@
 #
 # Drop a few real iPhone exports into ./sample/ first. This script copies them
 # into a throwaway ./.scratch/ directory (since processing is in place), runs a
-# --dry-run, then the real conversion, and lists the result.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -21,11 +20,7 @@ rm -rf "$SCRATCH_DIR"
 mkdir -p "$SCRATCH_DIR"
 cp -a "$SAMPLE_DIR"/. "$SCRATCH_DIR"/
 
-echo "=== dry-run ==="
-podman run --rm -v "$PWD/$SCRATCH_DIR:/data" "$IMAGE" --dry-run
-
-echo "=== converting in place ==="
-podman run --rm -v "$PWD/$SCRATCH_DIR:/data" "$IMAGE"
+podman run --rm -it -v "$PWD/$SCRATCH_DIR:/data" "$IMAGE"
 
 echo "=== result ($SCRATCH_DIR) ==="
 ls -1 "$SCRATCH_DIR"

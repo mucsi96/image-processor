@@ -49,16 +49,16 @@ media folder at `/data`:
 
 ```bash
 # from the folder full of iPhone exports
-podman run --rm -v "$PWD:/data" mucsi96/image-processor
+podman run --rm -it -v "$PWD:/data" mucsi96/image-processor
 
 # preview what would happen, without changing anything
-podman run --rm -v "$PWD:/data" mucsi96/image-processor --dry-run
+podman run --rm -it -v "$PWD:/data" mucsi96/image-processor --dry-run
 ```
 
 `docker` works identically:
 
 ```bash
-docker run --rm -v "$PWD:/data" mucsi96/image-processor
+docker run --rm -it -v "$PWD:/data" mucsi96/image-processor
 ```
 
 ### Options

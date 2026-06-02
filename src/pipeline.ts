@@ -9,6 +9,7 @@ import { resolveTaken } from "./metadata/timestamp.js";
 import { createNamer } from "./naming.js";
 import { processFile } from "./processors/index.js";
 import { commitInPlace } from "./commit.js";
+import { promptForTimestamp } from "./prompt.js";
 import type { Options } from "./config.js";
 import type { Logger } from "./logger.js";
 import type { ProcessResult, ProcessingItem, ScannedFile, TakenTimestamp } from "./types.js";
@@ -41,7 +42,7 @@ export async function run(opts: Options, log: Logger): Promise<ProcessResult[]> 
     items.map((item) => item.source.absPath),
   );
 
-  const planned = planItems(items, metadata, opts.dir, files, log);
+  const planned = await planItems(items, metadata, opts.dir, files, log);
 
   if (opts.dryRun) {
     return reportDryRun(planned, log);
@@ -51,16 +52,19 @@ export async function run(opts: Options, log: Logger): Promise<ProcessResult[]> 
 }
 
 /** Assign deterministic output names, ordered by timestamp. */
-function planItems(
+async function planItems(
   items: ProcessingItem[],
   metadata: Map<string, { SourceFile: string }>,
   dir: string,
   allFiles: ScannedFile[],
   log: Logger,
-): PlannedItem[] {
+): Promise<PlannedItem[]> {
   const withTaken: { item: ProcessingItem; taken: TakenTimestamp }[] = [];
   for (const item of items) {
-    const taken = resolveTaken(metadata.get(item.source.absPath), item.source);
+    let taken = resolveTaken(metadata.get(item.source.absPath), item.source);
+    if (!taken) {
+      taken = await promptForTimestamp(item.source);
+    }
     if (!taken) {
       log.error(
         { input: item.source.name },

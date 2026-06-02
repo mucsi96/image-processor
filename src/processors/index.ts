@@ -4,7 +4,7 @@ import type { ScannedFile } from "../types.js";
 import { processPhoto } from "./photo.js";
 import { processVideo } from "./video.js";
 
-/** Dispatch a file to the right processor, writing a PNG to outPath. */
+/** Dispatch a file to the right processor, writing a JPEG to outPath. */
 export async function processFile(
   bin: Binaries,
   file: ScannedFile,

@@ -2,7 +2,7 @@ import { rename, rm, copyFile, unlink } from "node:fs/promises";
 import type { ScannedFile } from "./types.js";
 
 /**
- * Move a freshly produced temp PNG to its final in-place location, then remove
+ * Move a freshly produced temp JPEG to its final in-place location, then remove
  * the original source file and all attached leftovers (paired video, sidecars).
  *
  * Uses rename when possible and falls back to copy+unlink across devices.

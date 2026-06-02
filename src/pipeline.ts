@@ -82,7 +82,7 @@ async function planItems(
   }
 
   // Seed the namer with names of files that remain on disk (untouched), so a
-  // generated `<ms>.png` never clobbers an unrelated pre-existing file.
+  // generated `<ms>.jpg` never clobbers an unrelated pre-existing file.
   const survivors = allFiles.filter((f) => !consumed.has(f.absPath)).map((f) => f.name);
 
   const namer = createNamer(survivors);

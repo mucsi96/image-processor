@@ -36,7 +36,7 @@ export interface TakenTimestamp {
  * should be removed once the conversion succeeds (Live Photo video + sidecars).
  */
 export interface ProcessingItem {
-  /** The file that produces the PNG. */
+  /** The file that produces the JPEG. */
   source: ScannedFile;
   /** Files sharing the stem that get deleted on commit (video, .AAE, .XMP, ...). */
   leftovers: ScannedFile[];

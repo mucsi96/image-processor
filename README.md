@@ -1,6 +1,7 @@
 # image-processor
 
-A batch CLI that turns a folder of iPhone media into a clean, uniformly-named set of PNGs.
+A batch CLI that turns a folder of iPhone media into a clean, uniformly-named set of
+high-quality JPEGs (print-ready, e.g. for CEWE photo books).
 
 It is built to run as a Docker image (published to Docker Hub) so it works the same on WSL,
 Linux, or macOS via `podman`/`docker` with a single volume mount.
@@ -17,29 +18,29 @@ For every supported file in a directory it:
    `-auto-orient`).
 3. **Extracts the best still** from short Live Photo videos — a single representative frame
    (FFmpeg `thumbnail` filter).
-4. **Converts to PNG**.
-5. **Renames** the output to `<capture-timestamp-unix-epoch-ms>.png`
-   (e.g. `1717236000123.png`). Same-millisecond collisions get a `_1`, `_2`, … suffix.
+4. **Converts to a high-quality JPEG** (quality 100, no chroma subsampling — sized for print).
+5. **Renames** the output to `<capture-timestamp-unix-epoch-ms>.jpg`
+   (e.g. `1717236000123.jpg`). Same-millisecond collisions get a `_1`, `_2`, … suffix.
 
 ### Supported input
 
 | Type                      | Extensions             | Handling                             |
 | ------------------------- | ---------------------- | ------------------------------------ |
-| JPEG                      | `.jpg`, `.jpeg`        | orient → PNG                         |
-| HEIC / HEIF               | `.heic`, `.heif`       | orient → PNG (primary image)         |
-| Live Photo / short videos | `.mov`, `.mp4`, `.m4v` | best frame → orient → PNG (if short) |
+| JPEG                      | `.jpg`, `.jpeg`        | orient → JPEG                         |
+| HEIC / HEIF               | `.heic`, `.heif`       | orient → JPEG (primary image)         |
+| Live Photo / short videos | `.mov`, `.mp4`, `.m4v` | best frame → orient → JPEG (if short) |
 
 ### Live Photos and leftovers
 
 iPhone Live Photos arrive as a **pair** that shares a basename — a still (`IMG_1234.HEIC`) and
 a video (`IMG_1234.MOV`), sometimes with an `.AAE` edit-metadata sidecar. When a still is
 present the tool converts **only the still** and removes **all leftovers for that stem** (the
-paired video and any `.AAE`/`.XMP` sidecars), so each group collapses to a single PNG.
+paired video and any `.AAE`/`.XMP` sidecars), so each group collapses to a single JPEG.
 
 Standalone videos are processed into a still only when they are short (Live-Photo length,
 `--max-video-seconds`, default `6`); longer clips are left untouched.
 
-> ⚠️ **Processing happens in place.** Each converted original is **replaced** by its PNG and
+> ⚠️ **Processing happens in place.** Each converted original is **replaced** by its JPEG and
 > the source file (plus its leftovers) is deleted. Keep a backup and/or run `--dry-run` first.
 
 ## Usage
@@ -73,7 +74,7 @@ Options:
   -c, --concurrency <n>        files processed in parallel (default: CPU count)
   -m, --max-video-seconds <n>  skip videos longer than this many seconds (default: 6)
   -d, --dry-run                report planned conversions/deletions without changing files
-  -e, --enhance                apply photo-book tone enhancement to every output PNG
+  -e, --enhance                apply photo-book tone enhancement to every output JPEG
   -l, --log-level <level>      debug | info | warn | error (default: info)
   -h, --help                   show help
 ```
@@ -83,7 +84,7 @@ Options:
 When you're producing a printed photo book, screen-ready pixels usually need a
 small global lift: print absorbs ink (muting saturation), looks flatter than a
 backlit display, and softens edges through halftone reproduction. Passing
-`--enhance` (or `-e`) runs every output PNG — both stills and Live Photo
+`--enhance` (or `-e`) runs every output JPEG — both stills and Live Photo
 frames — through a subtle, print-targeted ImageMagick filter chain:
 
 | Step                              | What it does                                              |
@@ -95,7 +96,7 @@ frames — through a subtle, print-targeted ImageMagick filter chain:
 The filters run **after** orientation correction, so they operate on the final
 oriented pixels. Values were chosen to err on the side of natural — skin tones
 stay believable, skies don't band, and edges don't halo. Without the flag the
-tool's output is byte-equivalent to previous versions.
+tool emits the same high-quality JPEG without the tone adjustments.
 
 ```bash
 # screen-ready (default)

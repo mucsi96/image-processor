@@ -12,7 +12,6 @@ export interface Options {
   concurrency: number;
   /** Videos longer than this (seconds) are left untouched. */
   maxVideoSeconds: number;
-  dryRun: boolean;
   logLevel: LogLevel;
 }
 
@@ -34,11 +33,6 @@ export function parseOptions(argv: string[]): Options {
       String(defaultConcurrency()),
     )
     .option("-m, --max-video-seconds <n>", "skip videos longer than this many seconds", "6")
-    .option(
-      "-d, --dry-run",
-      "report planned conversions and deletions without changing files",
-      false,
-    )
     .option("-l, --log-level <level>", `log level (${LOG_LEVELS.join("|")})`, "info")
     .allowExcessArguments(false);
 
@@ -47,7 +41,6 @@ export function parseOptions(argv: string[]): Options {
   const raw = program.opts<{
     concurrency: string;
     maxVideoSeconds: string;
-    dryRun: boolean;
     logLevel: string;
   }>();
   const [dirArg = "."] = program.processedArgs as [string?];
@@ -59,7 +52,7 @@ export function parseOptions(argv: string[]): Options {
 
   validateDir(dir);
 
-  return { dir, concurrency, maxVideoSeconds, dryRun: raw.dryRun, logLevel };
+  return { dir, concurrency, maxVideoSeconds, logLevel };
 }
 
 function defaultConcurrency(): number {

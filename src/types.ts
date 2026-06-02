@@ -20,7 +20,8 @@ export type TimestampSource =
   | "exif-subsec-tz"
   | "exif-datetimeoriginal"
   | "quicktime-creationdate"
-  | "quicktime-createdate";
+  | "quicktime-createdate"
+  | "user-prompt";
 
 export interface TakenTimestamp {
   /** Milliseconds since the Unix epoch (UTC). */
@@ -41,7 +42,7 @@ export interface ProcessingItem {
   leftovers: ScannedFile[];
 }
 
-export type ProcessStatus = "converted" | "skipped" | "planned" | "error";
+export type ProcessStatus = "converted" | "skipped" | "error";
 
 export interface ProcessResult {
   input: string;

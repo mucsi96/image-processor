@@ -9,6 +9,7 @@ import { resolveTaken } from "./metadata/timestamp.js";
 import { createNamer } from "./naming.js";
 import { processFile } from "./processors/index.js";
 import { commitInPlace } from "./commit.js";
+import { promptForTimestamp } from "./prompt.js";
 import type { Options } from "./config.js";
 import type { Logger } from "./logger.js";
 import type { ProcessResult, ProcessingItem, ScannedFile, TakenTimestamp } from "./types.js";
@@ -41,26 +42,25 @@ export async function run(opts: Options, log: Logger): Promise<ProcessResult[]> 
     items.map((item) => item.source.absPath),
   );
 
-  const planned = planItems(items, metadata, opts.dir, files, log);
-
-  if (opts.dryRun) {
-    return reportDryRun(planned, log);
-  }
+  const planned = await planItems(items, metadata, opts.dir, files, log);
 
   return processAll(planned, bin, opts, log);
 }
 
 /** Assign deterministic output names, ordered by timestamp. */
-function planItems(
+async function planItems(
   items: ProcessingItem[],
   metadata: Map<string, { SourceFile: string }>,
   dir: string,
   allFiles: ScannedFile[],
   log: Logger,
-): PlannedItem[] {
+): Promise<PlannedItem[]> {
   const withTaken: { item: ProcessingItem; taken: TakenTimestamp }[] = [];
   for (const item of items) {
-    const taken = resolveTaken(metadata.get(item.source.absPath), item.source);
+    let taken = resolveTaken(metadata.get(item.source.absPath), item.source);
+    if (!taken) {
+      taken = await promptForTimestamp(item.source);
+    }
     if (!taken) {
       log.error(
         { input: item.source.name },
@@ -132,28 +132,6 @@ async function processAll(
     },
     { concurrency: opts.concurrency },
   );
-}
-
-function reportDryRun(planned: PlannedItem[], log: Logger): ProcessResult[] {
-  return planned.map((item) => {
-    const removals = [item.source.name, ...item.leftovers.map((l) => l.name)];
-    log.info(
-      {
-        from: item.source.name,
-        to: item.finalName,
-        source: item.taken.source,
-        removes: removals,
-      },
-      "[dry-run] would convert",
-    );
-    return {
-      input: item.source.name,
-      output: item.finalName,
-      status: "planned",
-      source: item.taken.source,
-      leftoversRemoved: item.leftovers.length,
-    };
-  });
 }
 
 function tempPathFor(finalPath: string): string {

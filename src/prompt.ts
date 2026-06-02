@@ -4,7 +4,9 @@ import { parseDateParts } from "./metadata/timestamp.js";
 import type { ScannedFile, TakenTimestamp } from "./types.js";
 
 const PROMPT_HINT =
-  "Enter creation date (e.g. 2024-06-15T14:30:00Z or 2024-06-15 14:30:00+02:00), or blank to skip";
+  "Enter creation date (e.g. 2024-06-15, 2024-06-15T14:30:00Z, or 2024-06-15 14:30:00+02:00), or blank to skip";
+
+const DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 /**
  * Ask the user for a capture date for a file that has no metadata timestamp.
@@ -32,6 +34,12 @@ export async function promptForTimestamp(file: ScannedFile): Promise<TakenTimest
 }
 
 function toEpochMs(value: string): number | null {
+  const dateOnly = DATE_ONLY_RE.exec(value.trim());
+  if (dateOnly) {
+    const [, y, mo, d] = dateOnly;
+    const utc = Date.UTC(Number(y), Number(mo) - 1, Number(d));
+    return Number.isFinite(utc) ? utc : null;
+  }
   const parts = parseDateParts(value);
   if (!parts) return null;
   const offset = parts.offsetMinutes ?? 0;

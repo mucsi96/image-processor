@@ -49,16 +49,16 @@ media folder at `/data`:
 
 ```bash
 # from the folder full of iPhone exports
-podman run --rm -it -v "$PWD:/data" mucsi96/image-processor
+podman run --rm -it -v "$PWD:/data" docker.io/mucsi96/image-processor
 
 # preview what would happen, without changing anything
-podman run --rm -it -v "$PWD:/data" mucsi96/image-processor --dry-run
+podman run --rm -it -v "$PWD:/data" docker.io/mucsi96/image-processor --dry-run
 ```
 
 `docker` works identically:
 
 ```bash
-docker run --rm -it -v "$PWD:/data" mucsi96/image-processor
+docker run --rm -it -v "$PWD:/data" docker.io/mucsi96/image-processor
 ```
 
 ### Options
@@ -99,14 +99,14 @@ tool's output is byte-equivalent to previous versions.
 
 ```bash
 # screen-ready (default)
-podman run --rm -it -v "$PWD:/data" mucsi96/image-processor
+podman run --rm -it -v "$PWD:/data" docker.io/mucsi96/image-processor
 
 # print-ready for a photo book
-podman run --rm -it -v "$PWD:/data" mucsi96/image-processor --enhance
+podman run --rm -it -v "$PWD:/data" docker.io/mucsi96/image-processor --enhance
 ```
 
 Inside the container the working directory is `/data`, so `dir` defaults to the mount. To
-process a subfolder of the mount, pass it explicitly, e.g. `... mucsi96/image-processor exports`.
+process a subfolder of the mount, pass it explicitly, e.g. `... docker.io/mucsi96/image-processor exports`.
 
 ## How it's published
 

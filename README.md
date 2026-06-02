@@ -73,8 +73,36 @@ Options:
   -c, --concurrency <n>        files processed in parallel (default: CPU count)
   -m, --max-video-seconds <n>  skip videos longer than this many seconds (default: 6)
   -d, --dry-run                report planned conversions/deletions without changing files
+  -e, --enhance                apply photo-book tone enhancement to every output PNG
   -l, --log-level <level>      debug | info | warn | error (default: info)
   -h, --help                   show help
+```
+
+### Photo-book enhancement (`--enhance`)
+
+When you're producing a printed photo book, screen-ready pixels usually need a
+small global lift: print absorbs ink (muting saturation), looks flatter than a
+backlit display, and softens edges through halftone reproduction. Passing
+`--enhance` (or `-e`) runs every output PNG — both stills and Live Photo
+frames — through a subtle, print-targeted ImageMagick filter chain:
+
+| Step                              | What it does                                              |
+| --------------------------------- | --------------------------------------------------------- |
+| `-modulate 103,112`               | +3% brightness, +12% saturation (compensates print muting) |
+| `-sigmoidal-contrast 3,50%`       | gentle S-curve around mid-grey (no clipping)              |
+| `-unsharp 0x0.75+0.75+0.008`      | sub-pixel sharpening to survive halftone reproduction     |
+
+The filters run **after** orientation correction, so they operate on the final
+oriented pixels. Values were chosen to err on the side of natural — skin tones
+stay believable, skies don't band, and edges don't halo. Without the flag the
+tool's output is byte-equivalent to previous versions.
+
+```bash
+# screen-ready (default)
+podman run --rm -it -v "$PWD:/data" mucsi96/image-processor
+
+# print-ready for a photo book
+podman run --rm -it -v "$PWD:/data" mucsi96/image-processor --enhance
 ```
 
 Inside the container the working directory is `/data`, so `dir` defaults to the mount. To

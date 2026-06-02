@@ -9,13 +9,14 @@ export async function processFile(
   bin: Binaries,
   file: ScannedFile,
   outPath: string,
+  enhance: boolean,
 ): Promise<void> {
   switch (file.kind) {
     case "jpg":
     case "heic":
-      return processPhoto(bin, file, outPath);
+      return processPhoto(bin, file, outPath, enhance);
     case "video":
-      return processVideo(bin, file, outPath);
+      return processVideo(bin, file, outPath, enhance);
     default:
       throw new ProcessError(`Unsupported file kind for ${file.name}`);
   }

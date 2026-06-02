@@ -20,7 +20,7 @@ rm -rf "$SCRATCH_DIR"
 mkdir -p "$SCRATCH_DIR"
 cp -a "$SAMPLE_DIR"/. "$SCRATCH_DIR"/
 
-podman run --rm -it -v "$PWD/$SCRATCH_DIR:/data" "$IMAGE"
+podman run --rm -it -v "$PWD/$SCRATCH_DIR:/data" "$IMAGE" --enhance
 
 echo "=== result ($SCRATCH_DIR) ==="
 ls -1 "$SCRATCH_DIR"

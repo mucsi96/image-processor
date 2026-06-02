@@ -104,7 +104,7 @@ async function processAll(
     async (item): Promise<ProcessResult> => {
       const tempPath = tempPathFor(item.finalPath);
       try {
-        await processFile(bin, item.source, tempPath);
+        await processFile(bin, item.source, tempPath, opts.enhance);
         await commitInPlace(tempPath, item.finalPath, item.source, item.leftovers);
         log.info(
           { input: item.source.name, output: item.finalName, source: item.taken.source },

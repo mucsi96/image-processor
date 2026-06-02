@@ -13,6 +13,8 @@ export interface Options {
   /** Videos longer than this (seconds) are left untouched. */
   maxVideoSeconds: number;
   logLevel: LogLevel;
+  /** Apply a subtle photo-book tone enhancement to every output PNG. */
+  enhance: boolean;
 }
 
 const LOG_LEVELS: LogLevel[] = ["debug", "info", "warn", "error"];
@@ -34,6 +36,7 @@ export function parseOptions(argv: string[]): Options {
     )
     .option("-m, --max-video-seconds <n>", "skip videos longer than this many seconds", "6")
     .option("-l, --log-level <level>", `log level (${LOG_LEVELS.join("|")})`, "info")
+    .option("-e, --enhance", "apply subtle photo-book tone enhancement to every output PNG")
     .allowExcessArguments(false);
 
   program.parse(argv, { from: "user" });
@@ -42,17 +45,19 @@ export function parseOptions(argv: string[]): Options {
     concurrency: string;
     maxVideoSeconds: string;
     logLevel: string;
+    enhance?: boolean;
   }>();
   const [dirArg = "."] = program.processedArgs as [string?];
 
   const concurrency = parsePositiveInt(raw.concurrency, "concurrency");
   const maxVideoSeconds = parsePositiveNumber(raw.maxVideoSeconds, "max-video-seconds");
   const logLevel = parseLogLevel(raw.logLevel);
+  const enhance = Boolean(raw.enhance);
   const dir = resolve(dirArg);
 
   validateDir(dir);
 
-  return { dir, concurrency, maxVideoSeconds, logLevel };
+  return { dir, concurrency, maxVideoSeconds, logLevel, enhance };
 }
 
 function defaultConcurrency(): number {

@@ -1,0 +1,66 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - name: Verify Docker image builds (incl. HEIC delegate check)
+        run: docker build -t localhost/image-processor:ci .
+
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: publish-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - id: version
+        uses: mucsi96/get-next-version@main
+        with:
+          prefix: v
+      - name: Log in to Docker Hub
+        if: steps.version.outputs.hasNextVersion == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Buildx
+        if: steps.version.outputs.hasNextVersion == 'true'
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        if: steps.version.outputs.hasNextVersion == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/image-processor:${{ steps.version.outputs.version }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/image-processor:latest
+      - name: Create GitHub release
+        if: steps.version.outputs.hasNextVersion == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "${{ steps.version.outputs.tag }}" --title "${{ steps.version.outputs.tag }}" --generate-notes

@@ -13,7 +13,7 @@ export interface Options {
   /** Videos longer than this (seconds) are left untouched. */
   maxVideoSeconds: number;
   logLevel: LogLevel;
-  /** Apply a subtle photo-book tone enhancement to every output PNG. */
+  /** Apply a subtle photo-book tone enhancement to every output JPEG. */
   enhance: boolean;
 }
 
@@ -26,7 +26,8 @@ export function parseOptions(argv: string[]): Options {
     .name("image-processor")
     .description(
       "Batch-convert iPhone media (JPG, HEIC, Live Photo videos) in a directory into " +
-        "orientation-corrected PNGs named by capture timestamp. Processes files IN PLACE.",
+        "orientation-corrected high-quality JPEGs named by capture timestamp. " +
+        "Processes files IN PLACE.",
     )
     .argument("[dir]", "directory to process (default: current working directory)", ".")
     .option(
@@ -36,7 +37,7 @@ export function parseOptions(argv: string[]): Options {
     )
     .option("-m, --max-video-seconds <n>", "skip videos longer than this many seconds", "6")
     .option("-l, --log-level <level>", `log level (${LOG_LEVELS.join("|")})`, "info")
-    .option("-e, --enhance", "apply subtle photo-book tone enhancement to every output PNG")
+    .option("-e, --enhance", "apply subtle photo-book tone enhancement to every output JPEG")
     .allowExcessArguments(false);
 
   program.parse(argv, { from: "user" });

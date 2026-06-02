@@ -1,8 +1,9 @@
 # image-processor — contributor guide
 
 A TypeScript/Node.js (ESM, Node 22) CLI that batch-converts iPhone media (JPG, HEIC, Live
-Photo videos) in a directory **in place** into orientation-corrected PNGs named by capture
-timestamp (`<unix-epoch-ms>.png`).
+Photo videos) in a directory **in place** into orientation-corrected, high-quality JPEGs
+(quality 100, 4:4:4 chroma — sized for print, e.g. CEWE photo books) named by capture
+timestamp (`<unix-epoch-ms>.jpg`).
 
 ## Architecture
 
@@ -10,11 +11,11 @@ The tool orchestrates three system binaries (bundled in the Docker image) via ch
 it does not reimplement codecs in JS:
 
 - **ExifTool** — metadata / capture timestamps (`src/metadata/exiftool.ts`)
-- **ImageMagick** — orientation + raster conversion, HEIC via libheif (`src/processors/photo.ts`)
+- **ImageMagick** — orientation + high-quality JPEG conversion, HEIC via libheif (`src/processors/photo.ts`, `src/processors/jpeg.ts`)
 - **FFmpeg/ffprobe** — Live Photo frame extraction + duration probe (`src/processors/video.ts`, `src/scanner.ts`)
 
 Pipeline (`src/pipeline.ts`): preflight binaries → scan dir → group by stem & filter →
-batch-read metadata → resolve timestamp → process to temp PNG → commit in place (move PNG,
+batch-read metadata → resolve timestamp → process to temp JPEG → commit in place (move JPEG,
 delete original + leftovers).
 
 ## Conventions

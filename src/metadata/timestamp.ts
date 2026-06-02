@@ -131,10 +131,10 @@ function resolveVideo(rec: ExifRecord): Resolved | null {
 }
 
 /**
- * Resolve the most reliable "taken" timestamp for a file, falling back through
- * EXIF/QuickTime tags and finally the filesystem mtime.
+ * Resolve the most reliable "taken" timestamp for a file from EXIF/QuickTime
+ * metadata. Returns null when no metadata timestamp is available.
  */
-export function resolveTaken(rec: ExifRecord | undefined, file: ScannedFile): TakenTimestamp {
+export function resolveTaken(rec: ExifRecord | undefined, file: ScannedFile): TakenTimestamp | null {
   if (rec) {
     const resolved = file.kind === "video" ? resolveVideo(rec) : resolvePhoto(rec);
     // A still might lack EXIF but a video might carry photo tags and vice versa;
@@ -149,11 +149,7 @@ export function resolveTaken(rec: ExifRecord | undefined, file: ScannedFile): Ta
       };
     }
   }
-  return {
-    epochMs: Math.round(file.stat.mtimeMs),
-    source: "filesystem-mtime",
-    hadTimezone: false,
-  };
+  return null;
 }
 
 function str(value: unknown): string | undefined {

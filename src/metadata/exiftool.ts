@@ -57,10 +57,12 @@ export async function readMetadataBatch(
 async function runChunk(exiftoolBin: string, files: string[]): Promise<ExifRecord[]> {
   if (files.length === 0) return [];
   try {
-    // No -dateFormat / QuickTimeUTC: exiftool emits the raw stored values
-    // (DateTimeOriginal without tz, CreationDate with its offset, QuickTime
-    // CreateDate as UTC), and timezone interpretation is done in timestamp.ts.
-    const { stdout } = await execa(exiftoolBin, ["-json", "-fast2", ...TAGS, ...files]);
+    // No -dateFormat / -fast2 / QuickTimeUTC: exiftool emits the raw stored
+    // values (DateTimeOriginal without tz, CreationDate with its offset,
+    // QuickTime CreateDate as UTC), and timezone interpretation is done in
+    // timestamp.ts.  -fast2 is intentionally omitted because it skips the
+    // embedded EXIF block inside HEIC (ISOBMFF) containers.
+    const { stdout } = await execa(exiftoolBin, ["-json", ...TAGS, ...files]);
     if (!stdout.trim()) return [];
     return JSON.parse(stdout) as ExifRecord[];
   } catch (error) {

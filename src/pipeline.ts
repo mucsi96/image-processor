@@ -41,7 +41,7 @@ export async function run(opts: Options, log: Logger): Promise<ProcessResult[]> 
     items.map((item) => item.source.absPath),
   );
 
-  const planned = planItems(items, metadata, opts.dir, files);
+  const planned = planItems(items, metadata, opts.dir, files, log);
 
   if (opts.dryRun) {
     return reportDryRun(planned, log);
@@ -56,11 +56,20 @@ function planItems(
   metadata: Map<string, { SourceFile: string }>,
   dir: string,
   allFiles: ScannedFile[],
+  log: Logger,
 ): PlannedItem[] {
-  const withTaken = items.map((item) => ({
-    item,
-    taken: resolveTaken(metadata.get(item.source.absPath), item.source),
-  }));
+  const withTaken: { item: ProcessingItem; taken: TakenTimestamp }[] = [];
+  for (const item of items) {
+    const taken = resolveTaken(metadata.get(item.source.absPath), item.source);
+    if (!taken) {
+      log.error(
+        { input: item.source.name },
+        "no metadata timestamp found — skipping file",
+      );
+      continue;
+    }
+    withTaken.push({ item, taken });
+  }
 
   // Sort by capture time so same-millisecond suffixes are reproducible.
   withTaken.sort((a, b) => a.taken.epochMs - b.taken.epochMs);

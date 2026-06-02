@@ -20,8 +20,7 @@ export type TimestampSource =
   | "exif-subsec-tz"
   | "exif-datetimeoriginal"
   | "quicktime-creationdate"
-  | "quicktime-createdate"
-  | "filesystem-mtime";
+  | "quicktime-createdate";
 
 export interface TakenTimestamp {
   /** Milliseconds since the Unix epoch (UTC). */

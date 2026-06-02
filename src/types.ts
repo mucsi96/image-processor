@@ -42,7 +42,7 @@ export interface ProcessingItem {
   leftovers: ScannedFile[];
 }
 
-export type ProcessStatus = "converted" | "skipped" | "planned" | "error";
+export type ProcessStatus = "converted" | "skipped" | "error";
 
 export interface ProcessResult {
   input: string;

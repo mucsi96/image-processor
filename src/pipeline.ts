@@ -44,10 +44,6 @@ export async function run(opts: Options, log: Logger): Promise<ProcessResult[]> 
 
   const planned = await planItems(items, metadata, opts.dir, files, log);
 
-  if (opts.dryRun) {
-    return reportDryRun(planned, log);
-  }
-
   return processAll(planned, bin, opts, log);
 }
 
@@ -136,28 +132,6 @@ async function processAll(
     },
     { concurrency: opts.concurrency },
   );
-}
-
-function reportDryRun(planned: PlannedItem[], log: Logger): ProcessResult[] {
-  return planned.map((item) => {
-    const removals = [item.source.name, ...item.leftovers.map((l) => l.name)];
-    log.info(
-      {
-        from: item.source.name,
-        to: item.finalName,
-        source: item.taken.source,
-        removes: removals,
-      },
-      "[dry-run] would convert",
-    );
-    return {
-      input: item.source.name,
-      output: item.finalName,
-      status: "planned",
-      source: item.taken.source,
-      leftoversRemoved: item.leftovers.length,
-    };
-  });
 }
 
 function tempPathFor(finalPath: string): string {

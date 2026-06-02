@@ -21,7 +21,7 @@ async function main(): Promise<void> {
 
   try {
     const results = await run(options, log);
-    printSummary(results, options.dryRun, log);
+    printSummary(results, log);
     if (results.some((r) => r.status === "error")) {
       process.exitCode = 1;
     }
@@ -37,11 +37,9 @@ async function main(): Promise<void> {
 
 function printSummary(
   results: ProcessResult[],
-  dryRun: boolean,
   log: ReturnType<typeof createLogger>,
 ): void {
   const converted = results.filter((r) => r.status === "converted").length;
-  const planned = results.filter((r) => r.status === "planned").length;
   const errors = results.filter((r) => r.status === "error").length;
   const leftoversRemoved = results.reduce((sum, r) => sum + r.leftoversRemoved, 0);
 
@@ -53,11 +51,12 @@ function printSummary(
 
   log.info(
     {
-      ...(dryRun ? { planned } : { converted, leftoversRemoved }),
+      converted,
+      leftoversRemoved,
       errors,
       timestampSources: bySource,
     },
-    dryRun ? "dry-run summary" : "done",
+    "done",
   );
 }
 

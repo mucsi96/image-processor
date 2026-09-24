@@ -1,5 +1,26 @@
 # image-processor
 
+## Quick start: process your sample folder
+
+With `podman` installed, put your iPhone media directly in the project's `sample/` folder
+(subfolders are not scanned), then run from the repository root:
+
+```bash
+./scripts/process_sample.sh
+```
+
+The script runs the published image and processes `sample/` **in place**, replacing originals
+with timestamp-named JPEGs and deleting associated leftovers. Keep a backup of your media.
+
+Optional flags are forwarded to the CLI:
+
+```bash
+./scripts/process_sample.sh --dry-run  # preview changes
+./scripts/process_sample.sh --enhance  # apply photo-book tone enhancement
+```
+
+## Overview
+
 A batch CLI that turns a folder of iPhone media into a clean, uniformly-named set of
 high-quality JPEGs (print-ready, e.g. for CEWE photo books).
 

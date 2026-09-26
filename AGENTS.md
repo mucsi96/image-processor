@@ -1,5 +1,16 @@
 # image-processor — contributor guide
 
+## Code Review Rules
+
+- Review the PR diff for actionable correctness, security, data-loss, and deployment regressions; cite the changed file/line and concrete impact.
+- Preserve authentication boundaries, persisted data compatibility, and the project's documented build/test/deploy contracts. Adapt shared patterns to this project's stack.
+- Report missing behavioral coverage where it would catch a specific regression; leave formatting and mechanical checks to CI.
+
+## Codex automation
+
+Use native Codex GitHub reviews and `@codex` PR tasks with ChatGPT sign-in.
+Setup: https://github.com/mucsi96/skeleton-app/blob/main/docs/codex-automation.md
+
 A TypeScript/Node.js (ESM, Node 22) CLI that batch-converts iPhone media (JPG, HEIC, Live
 Photo videos) in a directory **in place** into orientation-corrected, high-quality JPEGs
 (quality 100, 4:4:4 chroma — sized for print, e.g. CEWE photo books) named by capture
